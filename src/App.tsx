@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button'
 
 const App: React.FC = () => {
-  return <Button>essa</Button>;
-};
+  return <Button>essa</Button>
+}
 
-export { App };
+export { App }
