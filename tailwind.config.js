@@ -27,6 +27,10 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)',
       },
       colors: {},
+      fontFamily: {
+        dogicapixel: ['dogicapixel', 'sans-serif'],
+        dogicapixelbold: ['dogicapixelbold', 'sans-serif'],
+      },
     },
   },
   plugins: [require('tailwindcss-animate')],

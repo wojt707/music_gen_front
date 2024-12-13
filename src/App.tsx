@@ -27,7 +27,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="text-white">
+    <div className="text-white font-dogicapixel">
       <Parallax pages={numberOfPages} ref={parallaxRef}>
         <ParallaxLayer
           offset={0}
