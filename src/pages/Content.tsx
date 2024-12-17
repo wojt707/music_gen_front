@@ -1,7 +1,9 @@
 import { ParallaxLayer } from '@react-spring/parallax'
-import { About, Generate, Home, Parameters, Preview } from '.'
+import { About, Home, Parameters, Preview } from '.'
 import { useState } from 'react'
 import { generateMidi } from '@/services'
+import { Midi } from '@tonejs/midi'
+import { toast } from 'sonner'
 
 type ContentProps = {
   pianoWidth: number
@@ -9,18 +11,32 @@ type ContentProps = {
 }
 
 const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null)
+  const [midi, setMidi] = useState<Midi | null>(null)
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (params: {
+    genre: string
+    tempo: number
+    duration: number
+  }) => {
     try {
-      const midiBlob = await generateMidi({ genre: 'rock' })
-      const url = URL.createObjectURL(midiBlob)
-      setDownloadUrl(url)
+      const midiBlob = await generateMidi(params)
+      const arrayBuffer = await midiBlob.arrayBuffer()
+      const midi = new Midi(arrayBuffer)
+      setMidi(midi)
+
+      toast.success('MIDI generated successfully')
+      onScrollTo(2)
     } catch (error) {
-      // TODO handling errors
-      alert('Failed to generate MIDI. Error: ' + error)
+      toast.error('Error generating MIDI: ' + error)
     }
   }
+
+  const getDownloadUrl = (): string | null => {
+    if (!midi) return null
+    const midiBlob = new Blob([midi.toArray()], { type: 'audio/midi' })
+    return URL.createObjectURL(midiBlob)
+  }
+
   return (
     <>
       <ParallaxLayer
@@ -41,7 +57,7 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
           width: `calc(100%-${pianoWidth}px)`,
         }}
       >
-        <Parameters />
+        <Parameters onGenerate={handleGenerate} />
       </ParallaxLayer>
       <ParallaxLayer
         offset={2}
@@ -51,20 +67,10 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
           width: `calc(100%-${pianoWidth}px)`,
         }}
       >
-        <Generate onGenerate={handleGenerate} />
+        <Preview downloadUrl={getDownloadUrl()} midi={midi} />
       </ParallaxLayer>
       <ParallaxLayer
         offset={3}
-        speed={0.5}
-        style={{
-          marginLeft: `${pianoWidth}px`,
-          width: `calc(100%-${pianoWidth}px)`,
-        }}
-      >
-        <Preview downloadUrl={downloadUrl} />
-      </ParallaxLayer>
-      <ParallaxLayer
-        offset={4}
         speed={0.5}
         style={{
           marginLeft: `${pianoWidth}px`,

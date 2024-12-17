@@ -4,7 +4,7 @@ type NavbarProps = {
 const Navbar: React.FC<NavbarProps> = ({ scrollTo }) => {
   return (
     <div
-      className="w-full h-20 bg-black flex  flex-row justify-between items-center text-xl px-16 opacity-80"
+      className="w-full h-20 bg-black/80 backdrop-blur-sm flex flex-row justify-between items-center text-xl px-16"
       style={{ pointerEvents: 'auto' }}
     >
       <div className="cursor-pointer" onClick={() => scrollTo(0)}>

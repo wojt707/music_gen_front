@@ -1,3 +1,3 @@
-import { generateMidi } from './midiApi'
+import { generateMidi, getGenres } from './midiApi'
 
-export { generateMidi }
+export { generateMidi, getGenres }

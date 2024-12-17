@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/Button'
 
 type HomeProps = {
   onScrollTo: (page: number) => void
@@ -10,7 +10,9 @@ const Home: React.FC<HomeProps> = ({ onScrollTo }) => {
     >
       <div className="text-8xl">MidiForge</div>
       <div className="text-lg">Everyone is a musician.</div>
-      <Button onClick={() => onScrollTo(1)}>Try it!</Button>
+      <Button variant="outline" onClick={() => onScrollTo(1)}>
+        Try it!
+      </Button>
     </div>
   )
 }
