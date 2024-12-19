@@ -1,9 +1,14 @@
-import { Button } from '@/components/ui/button'
+import { Button, MidiPlayer, PianoRoll } from '@/components'
+import { Midi } from '@tonejs/midi'
+import { useState } from 'react'
 
 type PreviewProps = {
   downloadUrl: string | null
+  midi: Midi | null
 }
-const Preview: React.FC<PreviewProps> = ({ downloadUrl }) => {
+const Preview: React.FC<PreviewProps> = ({ downloadUrl, midi }) => {
+  const [isPlaying, setIsPlaying] = useState<boolean>(false)
+
   const handleDownload = () => {
     if (downloadUrl) {
       const anchor = document.createElement('a')
@@ -16,11 +21,20 @@ const Preview: React.FC<PreviewProps> = ({ downloadUrl }) => {
       alert('No file available for download.')
     }
   }
+
   return (
-    <div className={`flex flex-col items-center justify-center gap-4 h-full`}>
-      <div>Preview your generated music here (e.g., Piano Roll)</div>
+    <div className="flex flex-col items-center justify-center gap-4 h-full p-4">
+      <div className="flex flex-col items-center justify-center gap-4">
+        <PianoRoll midi={midi} isPlaying={isPlaying} />
+        <MidiPlayer
+          midi={midi}
+          isPlaying={isPlaying}
+          setIsPlaying={setIsPlaying}
+        />
+      </div>
       <Button
-        className="bg-green hover:opacity-80"
+        variant="outline"
+        className="bg-green"
         onClick={handleDownload}
         disabled={!downloadUrl}
       >

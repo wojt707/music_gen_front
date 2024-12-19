@@ -1,9 +1,9 @@
-import { ParallaxLayer } from '@react-spring/parallax'
 import { About, Home, Parameters, Preview } from '.'
 import { useState } from 'react'
 import { generateMidi } from '@/services'
 import { Midi } from '@tonejs/midi'
 import { toast } from 'sonner'
+import { PageWrapper } from '@/components'
 
 type ContentProps = {
   pianoWidth: number
@@ -39,46 +39,18 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
 
   return (
     <>
-      <ParallaxLayer
-        offset={0}
-        speed={0.5}
-        style={{
-          marginLeft: `${pianoWidth}px`,
-          width: `calc(100%-${pianoWidth}px)`,
-        }}
-      >
+      <PageWrapper pianoWidth={pianoWidth} offset={0}>
         <Home onScrollTo={onScrollTo} />
-      </ParallaxLayer>
-      <ParallaxLayer
-        offset={1}
-        speed={0.5}
-        style={{
-          marginLeft: `${pianoWidth}px`,
-          width: `calc(100%-${pianoWidth}px)`,
-        }}
-      >
+      </PageWrapper>
+      <PageWrapper pianoWidth={pianoWidth} offset={1}>
         <Parameters onGenerate={handleGenerate} />
-      </ParallaxLayer>
-      <ParallaxLayer
-        offset={2}
-        speed={0.5}
-        style={{
-          marginLeft: `${pianoWidth}px`,
-          width: `calc(100%-${pianoWidth}px)`,
-        }}
-      >
+      </PageWrapper>
+      <PageWrapper pianoWidth={pianoWidth} offset={2}>
         <Preview downloadUrl={getDownloadUrl()} midi={midi} />
-      </ParallaxLayer>
-      <ParallaxLayer
-        offset={3}
-        speed={0.5}
-        style={{
-          marginLeft: `${pianoWidth}px`,
-          width: `calc(100%-${pianoWidth}px)`,
-        }}
-      >
+      </PageWrapper>
+      <PageWrapper pianoWidth={pianoWidth} offset={3}>
         <About />
-      </ParallaxLayer>
+      </PageWrapper>
     </>
   )
 }

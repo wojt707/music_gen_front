@@ -17,7 +17,7 @@ type BackgroundNote = {
 
 const App: React.FC = () => {
   const numberOfPages = 3.5
-  const numberOfNotes = 200
+  const numberOfNotes = 100
   const pianoWidth = 245 // Piano keyboard width in pixels
 
   const notes: BackgroundNote[] = Array.from(

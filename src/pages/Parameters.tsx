@@ -77,11 +77,11 @@ const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
             type="number"
             value={duration || ''}
             onChange={(e) => setDuration(Number(e.target.value))}
-            className="w-1/2"
+            className="w-24"
           />
         </div>
       </div>
-      <Button variant="outline" onClick={handleGenerate}>
+      <Button variant="outline" onClick={handleGenerate} className="bg-blue">
         Generate Music
       </Button>
     </div>
