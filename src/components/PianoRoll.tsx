@@ -65,6 +65,16 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
     }
   }
 
+  const drawNotes = (ctx: CanvasRenderingContext2D, offset: number) => {
+    notes.forEach((note) => {
+      const x = note.time * rollSpeed - offset
+      const y = (pitchRange - note.midi - 1) * noteHeight
+      const width = note.duration * rollSpeed
+      ctx.fillStyle = '#0c7e45'
+      ctx.fillRect(x, y, width, noteHeight)
+    })
+  }
+
   // Draw the piano roll
   useEffect(() => {
     if (!canvasRef.current) return
@@ -74,9 +84,13 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
     if (!ctx) return
 
     const startTime = performance.now()
+
+    // First drawing - before player start
     drawLines(ctx, canvas.width)
+    drawNotes(ctx, 0)
+
     const draw = (currentTime: number) => {
-      if (!ctx || !isPlaying) return
+      if (!ctx) return
 
       const elapsed = (currentTime - startTime) / 1000
       const offset = elapsed * rollSpeed
@@ -87,13 +101,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
       drawLines(ctx, canvas.width)
 
       // Draw notes
-      notes.forEach((note) => {
-        const x = note.time * rollSpeed - offset
-        const y = (pitchRange - note.midi - 1) * noteHeight
-        const width = note.duration * rollSpeed
-        ctx.fillStyle = '#0c7e45'
-        ctx.fillRect(x, y, width, noteHeight)
-      })
+      drawNotes(ctx, offset)
 
       if (isPlaying) {
         animationRef.current = requestAnimationFrame(draw)
