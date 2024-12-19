@@ -53,16 +53,28 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
     loadMidi()
   }, [midi])
 
+  const drawLines = (ctx: CanvasRenderingContext2D, width: number) => {
+    ctx.strokeStyle = '#5e606e'
+    ctx.lineWidth = 1
+    for (let i = 0; i < pitchRange; i++) {
+      const y = i * noteHeight
+      ctx.beginPath()
+      ctx.moveTo(0, y)
+      ctx.lineTo(width, y)
+      ctx.stroke()
+    }
+  }
+
   // Draw the piano roll
   useEffect(() => {
-    if (!canvasRef.current || notes.length === 0) return
+    if (!canvasRef.current) return
 
     const canvas = canvasRef.current
     const ctx = canvas?.getContext('2d')
     if (!ctx) return
 
     const startTime = performance.now()
-
+    drawLines(ctx, canvas.width)
     const draw = (currentTime: number) => {
       if (!ctx || !isPlaying) return
 
@@ -72,15 +84,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Draw horizontal lines
-      ctx.strokeStyle = '#5e606e'
-      ctx.lineWidth = 1
-      for (let i = 0; i < pitchRange; i++) {
-        const y = i * noteHeight
-        ctx.beginPath()
-        ctx.moveTo(0, y)
-        ctx.lineTo(canvas.width, y)
-        ctx.stroke()
-      }
+      drawLines(ctx, canvas.width)
 
       // Draw notes
       notes.forEach((note) => {

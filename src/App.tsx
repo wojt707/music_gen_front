@@ -1,9 +1,8 @@
 import { IParallax, Parallax, ParallaxLayer } from '@react-spring/parallax'
 import { memo, useRef } from 'react'
-import { Navbar } from './components'
+import { Navbar, PianoBackground } from './components'
 import { Content } from './pages'
 import backgroundImg from '@/assets/back1.png'
-import pianoImg from '@/assets/piano-pixel.png'
 
 type BackgroundNote = {
   id: number
@@ -18,7 +17,7 @@ type BackgroundNote = {
 const App: React.FC = () => {
   const numberOfPages = 3.5
   const numberOfNotes = 100
-  const pianoWidth = 245 // Piano keyboard width in pixels
+  const pianoWidth = window.innerWidth > 1200 ? 245 : 0 // Background piano keyboard width in pixels
 
   const notes: BackgroundNote[] = Array.from(
     { length: numberOfNotes },
@@ -41,7 +40,6 @@ const App: React.FC = () => {
 
   const Note = memo(({ note }: { note: BackgroundNote }) => (
     <ParallaxLayer
-      // key={note.id}
       offset={note.offset}
       speed={note.speed}
       style={{ opacity: note.opacity }}
@@ -68,14 +66,9 @@ const App: React.FC = () => {
             backgroundRepeat: 'repeat',
           }}
         />
-        <ParallaxLayer
-          offset={-0.5}
-          speed={-0.3}
-          factor={numberOfPages}
-          style={{
-            backgroundImage: `url(${pianoImg})`,
-            backgroundRepeat: 'repeat-y',
-          }}
+        <PianoBackground
+          screenWidth={window.innerWidth}
+          numberOfPages={numberOfNotes}
         />
         <ParallaxLayer
           sticky={{ start: 0, end: numberOfPages }}
