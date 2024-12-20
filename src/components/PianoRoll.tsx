@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
 import { cn } from '@/lib/utils'
+import * as Tone from 'tone'
 
 type Note = {
   midi: number
@@ -10,13 +11,15 @@ type Note = {
 
 type PianoRollProps = {
   midi: Midi | null
-  isPlaying: boolean
+  playbackState: Tone.PlaybackState
 }
 
-const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
+const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
   const [notes, setNotes] = useState<Note[]>([])
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const animationRef = useRef<number | null>(null) // Keep track of animation frame ID
+  const animationRef = useRef<number | null>(null)
+  const lastOffsetRef = useRef<number>(0)
+  const startTimeRef = useRef<number | null>(null)
 
   const pitchRange = 128
   const noteHeight = 20 // Height of each note tile
@@ -75,52 +78,54 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, isPlaying }) => {
     })
   }
 
-  // Draw the piano roll
   useEffect(() => {
     if (!canvasRef.current) return
 
     const canvas = canvasRef.current
-    const ctx = canvas?.getContext('2d')
+    const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    const startTime = performance.now()
-
-    // First drawing - before player start
-    drawLines(ctx, canvas.width)
-    drawNotes(ctx, 0)
-
     const draw = (currentTime: number) => {
-      if (!ctx) return
-
-      const elapsed = (currentTime - startTime) / 1000
-      const offset = elapsed * rollSpeed
+      if (!startTimeRef.current) startTimeRef.current = currentTime
+      const elapsed = (currentTime - startTimeRef.current) / 1000
+      const offset = lastOffsetRef.current + elapsed * rollSpeed
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-      // Draw horizontal lines
       drawLines(ctx, canvas.width)
-
-      // Draw notes
       drawNotes(ctx, offset)
 
-      if (isPlaying) {
-        animationRef.current = requestAnimationFrame(draw)
-      }
+      animationRef.current = requestAnimationFrame(draw)
     }
 
-    if (isPlaying) {
-      animationRef.current = requestAnimationFrame(draw) // Start animation
-    } else if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current) // Stop animation
+    if (playbackState === 'started') {
+      startTimeRef.current = performance.now()
+      animationRef.current = requestAnimationFrame(draw)
+      return
+    }
+    if (playbackState === 'paused') {
+      // Capture the last offset when paused
+      lastOffsetRef.current +=
+        ((performance.now() - (startTimeRef.current || 0)) / 1000) * rollSpeed
+    } else {
+      lastOffsetRef.current = 0
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      drawLines(ctx, canvas.width)
+      drawNotes(ctx, 0)
+    }
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
       animationRef.current = null
     }
+
     return () => {
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current) // Clean up animation
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        cancelAnimationFrame(animationRef.current)
         animationRef.current = null
       }
     }
-  }, [notes, isPlaying])
+  }, [notes, playbackState])
 
   return (
     <div className="h-[32rem] overflow-auto border flex flex-row">

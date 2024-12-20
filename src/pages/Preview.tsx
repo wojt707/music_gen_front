@@ -1,13 +1,15 @@
 import { Button, MidiPlayer, PianoRoll } from '@/components'
 import { Midi } from '@tonejs/midi'
 import { useState } from 'react'
+import * as Tone from 'tone'
 
 type PreviewProps = {
   downloadUrl: string | null
   midi: Midi | null
 }
 const Preview: React.FC<PreviewProps> = ({ downloadUrl, midi }) => {
-  const [isPlaying, setIsPlaying] = useState<boolean>(false)
+  const [playbackState, setPlaybackState] =
+    useState<Tone.PlaybackState>('stopped')
 
   const handleDownload = () => {
     if (downloadUrl) {
@@ -25,11 +27,11 @@ const Preview: React.FC<PreviewProps> = ({ downloadUrl, midi }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-4 h-full p-4">
       <div className="flex flex-col items-center justify-center gap-4">
-        <PianoRoll midi={midi} isPlaying={isPlaying} />
+        <PianoRoll midi={midi} playbackState={playbackState} />
         <MidiPlayer
           midi={midi}
-          isPlaying={isPlaying}
-          setIsPlaying={setIsPlaying}
+          playbackState={playbackState}
+          setPlaybackState={setPlaybackState}
         />
       </div>
       <Button

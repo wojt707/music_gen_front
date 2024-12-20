@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
 import * as Tone from 'tone'
 import { Button } from '.'
@@ -7,76 +7,62 @@ import { Pause, Play, RotateCcw } from 'lucide-react'
 
 type MidiPlayerProps = {
   midi: Midi | null
-  isPlaying: boolean
-  setIsPlaying: (isPlaying: boolean) => void
+  playbackState: Tone.PlaybackState
+  setPlaybackState: (playbackState: Tone.PlaybackState) => void
 }
 
 const MidiPlayer: React.FC<MidiPlayerProps> = ({
   midi,
-  isPlaying,
-  setIsPlaying,
+  playbackState,
+  setPlaybackState,
 }) => {
   const [progress, setProgress] = useState<number>(0)
-  const isPlayingRef = useRef<boolean>(false)
-  const synthRefs = useRef<Tone.PolySynth[]>([])
-  const playbackInterval = useRef<NodeJS.Timeout | null>(null)
+  const stoppedAt = useRef<number>(0)
 
   const playMidi = async () => {
-    if (!midi) return
-    setIsPlaying(true)
-    isPlayingRef.current = true
-    setProgress(0)
+    if (!midi || playbackState == 'started') return
+    if (playbackState == 'paused') {
+      Tone.getTransport().start(Tone.now(), stoppedAt.current)
+      setPlaybackState(Tone.getTransport().state)
+      return
+    }
 
     await Tone.start()
 
-    synthRefs.current.forEach((synth) => synth.dispose())
-    synthRefs.current = []
-
-    const startTime = Tone.now()
+    Tone.getTransport().seconds = 0
 
     midi.tracks.forEach((track) => {
       if (track.notes.length > 0) {
         const synth = new Tone.PolySynth().toDestination()
-        synthRefs.current.push(synth)
 
         track.notes.forEach((note) => {
-          synth.triggerAttackRelease(
-            note.name,
-            note.duration,
-            note.time + startTime,
-            note.velocity
-          )
+          Tone.getTransport().schedule((time) => {
+            synth.triggerAttackRelease(
+              note.name,
+              note.duration,
+              time,
+              note.velocity
+            )
+          }, note.time)
         })
       }
     })
 
-    // Interval to update the progress bar
-    playbackInterval.current = setInterval(() => {
-      if (isPlayingRef.current && midi.duration) {
-        const elapsed = Tone.now() - startTime
-        const progressValue = Math.min((elapsed / midi.duration) * 100, 100)
-        setProgress(progressValue)
-
-        if (progressValue >= 100) {
-          stopPlayback(1000)
-        }
-      }
-    }, 100)
+    Tone.getTransport().start()
+    setPlaybackState(Tone.getTransport().state)
   }
 
-  const stopPlayback = (delayMiliSeconds?: number) => {
-    setIsPlaying(false)
-    isPlayingRef.current = false
+  const resetPlayback = useCallback(() => {
+    setProgress(0)
+    Tone.getTransport().stop()
+    Tone.getTransport().cancel()
+    setPlaybackState(Tone.getTransport().state)
+  }, [setPlaybackState])
 
-    if (playbackInterval.current) {
-      clearInterval(playbackInterval.current)
-      playbackInterval.current = null
-    }
-
-    setTimeout(() => {
-      synthRefs.current.forEach((synth) => synth.dispose())
-      synthRefs.current = []
-    }, delayMiliSeconds || 0)
+  const pausePlayback = () => {
+    Tone.getTransport().pause()
+    setPlaybackState(Tone.getTransport().state)
+    stoppedAt.current = Tone.getTransport().seconds
   }
 
   const formatTime = (time: number): string => {
@@ -87,23 +73,43 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
       .padStart(2, '0')}`
   }
 
+  useEffect(() => {
+    const updateProgress = () => {
+      if (!midi) return
+      const currentTime = Tone.getTransport().seconds
+      const percentage = (currentTime / midi.duration) * 100
+      if (percentage > 100) {
+        resetPlayback()
+        return
+      }
+      setProgress(percentage)
+    }
+
+    if (playbackState == 'started') {
+      const interval = setInterval(updateProgress, 100)
+      return () => clearInterval(interval)
+    }
+  }, [playbackState, midi, resetPlayback])
+
   return (
     <div className="w-full flex flex-row justify-center items-center gap-4">
-      {isPlaying ? (
-        <Button
-          onClick={() => stopPlayback()}
-          disabled={!midi}
-          size="icon"
-          variant="ghost"
-        >
-          <Pause />
-        </Button>
-      ) : (
-        <Button onClick={playMidi} disabled={!midi} size="icon" variant="ghost">
-          <Play />
-        </Button>
-      )}
-      <Button disabled={!midi} size="icon" variant="ghost">
+      <Button onClick={playMidi} disabled={!midi} size="icon" variant="ghost">
+        <Play />
+      </Button>
+      <Button
+        onClick={pausePlayback}
+        disabled={!midi}
+        size="icon"
+        variant="ghost"
+      >
+        <Pause />
+      </Button>
+      <Button
+        onClick={resetPlayback}
+        disabled={!midi}
+        size="icon"
+        variant="ghost"
+      >
         <RotateCcw />
       </Button>
       <span>
