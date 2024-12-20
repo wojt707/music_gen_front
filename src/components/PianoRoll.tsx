@@ -143,7 +143,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
               <div
                 key={pitch}
                 className={cn(
-                  `h-[${noteHeight}px] w-full bg-white hover:${
+                  `h-5 w-full bg-white hover:${
                     isWhite ? 'bg-green' : 'bg-white'
                   } border-y border-light-gray`
                 )}

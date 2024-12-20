@@ -3,6 +3,20 @@ import { memo, useRef } from 'react'
 import { Navbar, PianoBackground } from './components'
 import { Content } from './pages'
 import backgroundImg from '@/assets/back1.png'
+import note0 from '@/assets/note0.png'
+import note1 from '@/assets/note1.png'
+import note2 from '@/assets/note2.png'
+import note3 from '@/assets/note3.png'
+import note4 from '@/assets/note4.png'
+import note5 from '@/assets/note5.png'
+import note6 from '@/assets/note6.png'
+import note7 from '@/assets/note7.png'
+import note8 from '@/assets/note8.png'
+import note9 from '@/assets/note9.png'
+import note10 from '@/assets/note10.png'
+import note11 from '@/assets/note11.png'
+import note12 from '@/assets/note12.png'
+import note13 from '@/assets/note13.png'
 
 type BackgroundNote = {
   id: number
@@ -14,6 +28,23 @@ type BackgroundNote = {
   leftMargin: number
 }
 
+const noteImages = [
+  note0,
+  note1,
+  note2,
+  note3,
+  note4,
+  note5,
+  note6,
+  note7,
+  note8,
+  note9,
+  note10,
+  note11,
+  note12,
+  note13,
+]
+
 const App: React.FC = () => {
   const numberOfPages = 3.5
   const numberOfNotes = 100
@@ -23,7 +54,7 @@ const App: React.FC = () => {
     { length: numberOfNotes },
     (_, i) => ({
       id: i,
-      src: `src/assets/note${Math.floor(Math.random() * 14)}.png`, // note0.png to note13.png
+      src: noteImages[Math.floor(Math.random() * 14)], // note0.png to note13.png
       offset: Math.random() * numberOfPages, // Random offset within pages
       speed: Math.random() * 3 - 1.5, // Random speed between -1.5 and 1.5
       opacity: Math.random() * 0.5 + 0.5, // Random opacity between 0.5 and 1
