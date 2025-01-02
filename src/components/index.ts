@@ -5,4 +5,4 @@ import { PageWrapper } from './PageWrapper'
 import { PianoBackground } from './PianoBackground'
 import { PianoRoll } from './PianoRoll'
 
-export { Button, Navbar, MidiPlayer, PageWrapper, PianoRoll, PianoBackground }
+export { Button, MidiPlayer, Navbar, PageWrapper, PianoBackground, PianoRoll }

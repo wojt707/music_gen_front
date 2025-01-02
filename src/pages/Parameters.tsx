@@ -1,5 +1,5 @@
 import { Button } from '@/components/Button'
-import { Input } from '@/components/ui/input'
+import { Input, Skeleton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { getGenres } from '@/services'
 import { useState, useEffect } from 'react'
@@ -16,23 +16,40 @@ type ParametersProps = {
 const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
   const [genres, setGenres] = useState<{ code: string; name: string }[]>([])
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null)
-  const [tempo, setTempo] = useState<number | null>(120) // Default tempo
-  const [duration, setDuration] = useState<number | null>(30) // Default duration in seconds
+  const [tempo, setTempo] = useState<number | null>(120) // Tempo in bpm
+  const [duration, setDuration] = useState<number | null>(30) // Duration of the song in seconds
+  const [isServerLoading, setIsServerLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchGenres = async () => {
       try {
+        setIsServerLoading(true)
         const genresData = await getGenres()
         setGenres(genresData)
       } catch (error) {
         toast.error('Error fetching genres: ' + error)
+      } finally {
+        setIsServerLoading(false)
       }
     }
     fetchGenres()
   }, [])
 
+  useEffect(() => {
+    if (isServerLoading) {
+      setTimeout(() => {
+        toast.info(
+          'Be patient, server is waking up... It can take approximately 60 seconds.'
+        )
+      }, 5000)
+    }
+  }, [isServerLoading])
+
   const handleGenerate = () => {
-    if (!selectedGenre || !tempo || !duration) {
+    if (!selectedGenre) {
+      toast.error('Please select the genre.')
+      return
+    } else if (!tempo || !duration) {
       toast.error('Please select all parameters.')
       return
     }
@@ -55,6 +72,12 @@ const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
             >
               {genre.name}
             </Button>
+          ))}
+        </div>
+      ) : isServerLoading ? (
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {Array.from({ length: 14 }).map((_, i) => (
+            <Skeleton key={i} className="w-[160px] h-[40px] bg-gray" />
           ))}
         </div>
       ) : (

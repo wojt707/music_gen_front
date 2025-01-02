@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
 import * as Tone from 'tone'
 import { Button } from '.'
-import { Progress } from './ui/progress'
+import { Progress } from './ui'
 import { Pause, Play, RotateCcw } from 'lucide-react'
 
 type MidiPlayerProps = {
