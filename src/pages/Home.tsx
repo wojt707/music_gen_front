@@ -10,7 +10,11 @@ const Home: React.FC<HomeProps> = ({ onScrollTo }) => {
     >
       <div className="text-8xl">MidiForge</div>
       <div className="text-lg">Everyone is a musician.</div>
-      <Button variant="outline" onClick={() => onScrollTo(1)}>
+      <Button
+        variant="outline"
+        className="animate-pulse hover:animate-none"
+        onClick={() => onScrollTo(1)}
+      >
         Try it!
       </Button>
     </div>

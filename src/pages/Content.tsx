@@ -4,7 +4,7 @@ import { generateMidi } from '@/services'
 import { Midi } from '@tonejs/midi'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components'
-import { BackendError } from '@/types'
+import { BackendError, GenerateMidiParams } from '@/types'
 
 type ContentProps = {
   pianoWidth: number
@@ -13,13 +13,11 @@ type ContentProps = {
 
 const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
   const [midi, setMidi] = useState<Midi | null>(null)
+  const [isGenerating, setIsGenerating] = useState<boolean>(false)
 
-  const handleGenerate = async (params: {
-    genre: string
-    tempo: number
-    duration: number
-  }) => {
+  const handleGenerate = async (params: GenerateMidiParams) => {
     try {
+      setIsGenerating(true)
       const midiBlob = await generateMidi(params)
       const arrayBuffer = await midiBlob.arrayBuffer()
       const midi = new Midi(arrayBuffer)
@@ -33,6 +31,8 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
       } else {
         toast.error(`Error generating MIDI: ${error}`)
       }
+    } finally {
+      setIsGenerating(false)
     }
   }
 
@@ -48,7 +48,7 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
         <Home onScrollTo={onScrollTo} />
       </PageWrapper>
       <PageWrapper pianoWidth={pianoWidth} offset={1}>
-        <Parameters onGenerate={handleGenerate} />
+        <Parameters onGenerate={handleGenerate} isGenerating={isGenerating} />
       </PageWrapper>
       <PageWrapper pianoWidth={pianoWidth} offset={2}>
         <Preview downloadUrl={getDownloadUrl()} midi={midi} />

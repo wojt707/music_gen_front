@@ -4,12 +4,12 @@ const About: React.FC = () => {
   return (
     <div className="flex flex-col justify-start items-center">
       <div>
-        <Button variant="link">
+        <Button variant="link" className="animate-pulse hover:animate-none">
           <a href="https://www.linkedin.com/in/wdolibog/" target="_blank">
             LinkedIn
           </a>
         </Button>
-        <Button variant="link">
+        <Button variant="link" className="animate-pulse hover:animate-none">
           <a href="https://github.com/wojt707" target="_blank">
             GitHub
           </a>

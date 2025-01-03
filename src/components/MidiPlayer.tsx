@@ -93,17 +93,20 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
 
   return (
     <div className="w-full flex flex-row justify-center items-center gap-4">
-      <Button onClick={playMidi} disabled={!midi} size="icon" variant="ghost">
-        <Play />
-      </Button>
-      <Button
-        onClick={pausePlayback}
-        disabled={!midi}
-        size="icon"
-        variant="ghost"
-      >
-        <Pause />
-      </Button>
+      {playbackState === 'started' ? (
+        <Button
+          onClick={pausePlayback}
+          disabled={!midi}
+          size="icon"
+          variant="ghost"
+        >
+          <Pause />
+        </Button>
+      ) : (
+        <Button onClick={playMidi} disabled={!midi} size="icon" variant="ghost">
+          <Play />
+        </Button>
+      )}
       <Button
         onClick={resetPlayback}
         disabled={!midi}

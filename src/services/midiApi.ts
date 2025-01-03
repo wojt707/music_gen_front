@@ -1,13 +1,13 @@
 import axios from 'axios'
-import { BackendError } from '@/types'
+import { BackendError, GenerateMidiParams } from '@/types'
 
 const API_BASE_URL = 'https://midiforgeapi.onrender.com/api'
 
 type GenerateMidiResponse = Blob
 
-const generateMidi = async (params: {
-  genre: string
-}): Promise<GenerateMidiResponse> => {
+const generateMidi = async (
+  params: GenerateMidiParams
+): Promise<GenerateMidiResponse> => {
   return axios
     .post<GenerateMidiResponse>(`${API_BASE_URL}/generate/`, params, {
       responseType: 'blob',
