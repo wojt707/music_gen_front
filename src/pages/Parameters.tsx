@@ -2,6 +2,7 @@ import { Button } from '@/components/Button'
 import { Input, Skeleton } from '@/components/ui'
 import { cn } from '@/lib/utils'
 import { getGenres } from '@/services'
+import { BackendError } from '@/types'
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -27,7 +28,11 @@ const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
         const genresData = await getGenres()
         setGenres(genresData)
       } catch (error) {
-        toast.error('Error fetching genres: ' + error)
+        if (error instanceof BackendError) {
+          toast.error(`Error fetching genres: ${error.message}`)
+        } else {
+          toast.error(`Error fetching genres: ${error}`)
+        }
       } finally {
         setIsServerLoading(false)
       }
@@ -47,10 +52,10 @@ const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
 
   const handleGenerate = () => {
     if (!selectedGenre) {
-      toast.error('Please select the genre.')
+      toast.info('Please select the genre.')
       return
     } else if (!tempo || !duration) {
-      toast.error('Please select all parameters.')
+      toast.info('Please select all parameters.')
       return
     }
     onGenerate({ genre: selectedGenre, tempo, duration })
@@ -76,7 +81,7 @@ const Parameters: React.FC<ParametersProps> = ({ onGenerate }) => {
         </div>
       ) : isServerLoading ? (
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {Array.from({ length: 14 }).map((_, i) => (
+          {Array.from({ length: 11 }).map((_, i) => (
             <Skeleton key={i} className="w-[160px] h-[40px] bg-gray" />
           ))}
         </div>

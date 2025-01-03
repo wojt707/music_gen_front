@@ -4,6 +4,7 @@ import { generateMidi } from '@/services'
 import { Midi } from '@tonejs/midi'
 import { toast } from 'sonner'
 import { PageWrapper } from '@/components'
+import { BackendError } from '@/types'
 
 type ContentProps = {
   pianoWidth: number
@@ -24,10 +25,14 @@ const Content: React.FC<ContentProps> = ({ pianoWidth, onScrollTo }) => {
       const midi = new Midi(arrayBuffer)
       setMidi(midi)
 
-      toast.success('MIDI generated successfully')
+      toast.success('MIDI generated successfully.')
       onScrollTo(2)
     } catch (error) {
-      toast.error('Error generating MIDI: ' + error)
+      if (error instanceof BackendError) {
+        toast.error(`Error generating MIDI: ${error.message}`)
+      } else {
+        toast.error(`Error generating MIDI: ${error}`)
+      }
     }
   }
 
