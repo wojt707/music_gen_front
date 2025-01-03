@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { BackendError, GenerateMidiParams } from '@/types'
 
-const API_BASE_URL = 'https://midiforgeapi.onrender.com/api'
+const API_BASE_URL = 'http://127.0.0.1:8000/api'
 
 type GenerateMidiResponse = Blob
 
