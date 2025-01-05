@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
 import * as Tone from 'tone'
 import { Button } from '.'
@@ -8,61 +8,28 @@ import { Pause, Play, RotateCcw } from 'lucide-react'
 type MidiPlayerProps = {
   midi: Midi | null
   playbackState: Tone.PlaybackState
-  setPlaybackState: (playbackState: Tone.PlaybackState) => void
+  onSetPlaybackState: (playbackState: Tone.PlaybackState) => void
 }
 
 const MidiPlayer: React.FC<MidiPlayerProps> = ({
   midi,
   playbackState,
-  setPlaybackState,
+  onSetPlaybackState: setPlaybackState,
 }) => {
   const [progress, setProgress] = useState<number>(0)
   const stoppedAt = useRef<number>(0)
+  const prevPlayback = useRef<Tone.PlaybackState>('stopped')
 
-  const playMidi = async () => {
-    if (!midi || playbackState == 'started') return
-    if (playbackState == 'paused') {
-      Tone.getTransport().start(Tone.now(), stoppedAt.current)
-      setPlaybackState(Tone.getTransport().state)
-      return
-    }
-
-    await Tone.start()
-
-    Tone.getTransport().seconds = 0
-
-    midi.tracks.forEach((track) => {
-      if (track.notes.length > 0) {
-        const synth = new Tone.PolySynth().toDestination()
-
-        track.notes.forEach((note) => {
-          Tone.getTransport().schedule((time) => {
-            synth.triggerAttackRelease(
-              note.name,
-              note.duration,
-              time,
-              note.velocity
-            )
-          }, note.time)
-        })
-      }
-    })
-
-    Tone.getTransport().start()
-    setPlaybackState(Tone.getTransport().state)
+  const startPlayback = () => {
+    setPlaybackState('started')
   }
 
-  const resetPlayback = useCallback(() => {
-    setProgress(0)
-    Tone.getTransport().stop()
-    Tone.getTransport().cancel()
-    setPlaybackState(Tone.getTransport().state)
-  }, [setPlaybackState])
+  const resetPlayback = () => {
+    setPlaybackState('stopped')
+  }
 
   const pausePlayback = () => {
-    Tone.getTransport().pause()
-    setPlaybackState(Tone.getTransport().state)
-    stoppedAt.current = Tone.getTransport().seconds
+    setPlaybackState('paused')
   }
 
   const formatTime = (time: number): string => {
@@ -74,12 +41,54 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
   }
 
   useEffect(() => {
+    const prevPlaybackTemp = prevPlayback.current
+    prevPlayback.current = playbackState
+
+    const play = async () => {
+      await Tone.start()
+
+      Tone.getTransport().seconds = 0
+
+      midi?.tracks.forEach((track) => {
+        if (track.notes.length > 0) {
+          const synth = new Tone.PolySynth(Tone.FMSynth).toDestination()
+
+          track.notes.forEach((note) => {
+            Tone.getTransport().schedule((time) => {
+              synth.triggerAttackRelease(note.name, note.duration, time)
+            }, note.time)
+          })
+        }
+      })
+
+      Tone.getTransport().start()
+    }
+
+    if (playbackState == 'started') {
+      if (!midi || prevPlaybackTemp == 'started') return
+      if (prevPlaybackTemp == 'paused') {
+        Tone.getTransport().start(Tone.now(), stoppedAt.current)
+        return
+      }
+
+      play()
+    } else if (playbackState == 'paused') {
+      Tone.getTransport().pause()
+      stoppedAt.current = Tone.getTransport().seconds
+    } else {
+      setProgress(0)
+      Tone.getTransport().stop()
+      Tone.getTransport().cancel()
+    }
+  }, [midi, playbackState])
+
+  useEffect(() => {
     const updateProgress = () => {
       if (!midi) return
       const currentTime = Tone.getTransport().seconds
       const percentage = (currentTime / midi.duration) * 100
       if (percentage > 100) {
-        resetPlayback()
+        setPlaybackState('stopped')
         return
       }
       setProgress(percentage)
@@ -89,7 +98,7 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
       const interval = setInterval(updateProgress, 100)
       return () => clearInterval(interval)
     }
-  }, [playbackState, midi, resetPlayback])
+  }, [midi, playbackState, setPlaybackState])
 
   return (
     <div className="w-full flex flex-row justify-center items-center gap-4">
@@ -103,7 +112,12 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
           <Pause />
         </Button>
       ) : (
-        <Button onClick={playMidi} disabled={!midi} size="icon" variant="ghost">
+        <Button
+          onClick={startPlayback}
+          disabled={!midi}
+          size="icon"
+          variant="ghost"
+        >
           <Play />
         </Button>
       )}
