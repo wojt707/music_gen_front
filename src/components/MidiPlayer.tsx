@@ -51,7 +51,9 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
 
       midi?.tracks.forEach((track) => {
         if (track.notes.length > 0) {
-          const synth = new Tone.PolySynth(Tone.FMSynth).toDestination()
+          const synth = new Tone.PolySynth(Tone.FMSynth, {
+            envelope: { attack: 0.02, decay: 0.1, sustain: 0.3, release: 1 },
+          }).toDestination()
 
           track.notes.forEach((note) => {
             Tone.getTransport().schedule((time) => {
