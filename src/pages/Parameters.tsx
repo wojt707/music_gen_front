@@ -100,7 +100,7 @@ const Parameters: React.FC<ParametersProps> = ({
             ))}
           </div>
         ) : (
-          'No genres found.'
+          <div className="text-center">No genres found.</div>
         )}
         <div className="flex flex-row items-center justify-between w-full gap-4">
           <div className="flex flex-col items-start justify-center gap-4 h-full min-w-fit">

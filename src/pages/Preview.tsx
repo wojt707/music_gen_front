@@ -1,6 +1,7 @@
 import { Button, MidiPlayer, PianoRoll } from '@/components'
+import { getPianoSamples } from '@/services'
+import { BackendError } from '@/types'
 import { Midi } from '@tonejs/midi'
-import { Piano } from '@tonejs/piano'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import * as Tone from 'tone'
@@ -18,7 +19,7 @@ const Preview: React.FC<PreviewProps> = ({
   playbackState,
   onSetPlaybackState: setPlaybackState,
 }) => {
-  const piano = useRef<Piano | null>(null)
+  const sampler = useRef<Tone.Sampler | null>(null)
   const [isPianoLoaded, setIsPianoLoaded] = useState(false)
 
   const handleDownload = () => {
@@ -30,24 +31,26 @@ const Preview: React.FC<PreviewProps> = ({
       anchor.click()
       document.body.removeChild(anchor)
     } else {
-      alert('No file available for download.')
+      toast.error(`No file available for download.`)
     }
   }
 
   useEffect(() => {
     const fetchPianoSamples = async () => {
-      piano.current = new Piano({
-        velocities: 1,
-        pedal: false,
-      }).toDestination()
+      try {
+        const sampleUrls = await getPianoSamples()
 
-      piano.current
-        .load()
-        .then(() => setIsPianoLoaded(true))
-        .catch((error) => {
-          console.error(error)
-          toast.error(`Error fetching genres: ${error}`)
-        })
+        sampler.current = new Tone.Sampler(sampleUrls, () => {
+          setIsPianoLoaded(true)
+        }).toDestination()
+      } catch (error) {
+        console.error('Error fetching piano samples:', error)
+        if (error instanceof BackendError) {
+          toast.error(`Error fetching piano samples: ${error.message}`)
+        } else {
+          toast.error(`Unknown error fetching piano samples.`)
+        }
+      }
     }
     fetchPianoSamples()
   }, [])
@@ -61,12 +64,12 @@ const Preview: React.FC<PreviewProps> = ({
           <div className="flex flex-col items-center justify-center gap-4">
             <PianoRoll
               midi={midi}
-              piano={piano.current}
+              sampler={sampler.current}
               playbackState={playbackState}
             />
             <MidiPlayer
               midi={midi}
-              piano={piano.current}
+              sampler={sampler.current}
               playbackState={playbackState}
               onSetPlaybackState={setPlaybackState}
             />

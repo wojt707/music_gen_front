@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
-import { Piano } from '@tonejs/piano'
 import * as Tone from 'tone'
 import { cn } from '@/lib/utils'
 
@@ -12,13 +11,13 @@ type Note = {
 
 type PianoRollProps = {
   midi: Midi | null
-  piano: Piano | null
+  sampler: Tone.Sampler | null
   playbackState: Tone.PlaybackState
 }
 
 const PianoRoll: React.FC<PianoRollProps> = ({
   midi,
-  piano,
+  sampler,
   playbackState,
 }) => {
   const [notes, setNotes] = useState<Note[]>([])
@@ -52,7 +51,8 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       console.log(`Tone context is ${Tone.getContext().state}`)
       await Tone.start()
     }
-    piano?.keyDown({ midi: midiPitch })
+
+    sampler?.triggerAttack(Tone.Midi(midiPitch).toNote())
   }
 
   const releaseKey = async (midiPitch: number) => {
@@ -63,7 +63,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
       await Tone.start()
     }
 
-    piano?.keyUp({ midi: midiPitch })
+    sampler?.triggerRelease(Tone.Midi(midiPitch).toNote())
   }
 
   useEffect(() => {

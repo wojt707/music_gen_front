@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
-import { Piano } from '@tonejs/piano'
 import * as Tone from 'tone'
 import { Button } from '.'
 import { Progress } from './ui'
@@ -8,14 +7,14 @@ import { Pause, Play, RotateCcw } from 'lucide-react'
 
 type MidiPlayerProps = {
   midi: Midi | null
-  piano: Piano | null
+  sampler: Tone.Sampler | null
   playbackState: Tone.PlaybackState
   onSetPlaybackState: (playbackState: Tone.PlaybackState) => void
 }
 
 const MidiPlayer: React.FC<MidiPlayerProps> = ({
   midi,
-  piano,
+  sampler,
   playbackState,
   onSetPlaybackState: setPlaybackState,
 }) => {
@@ -53,14 +52,10 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
       Tone.getTransport().seconds = 0
 
       midi?.tracks.forEach((track) => {
-        if (track.notes.length > 0 && piano) {
+        if (track.notes.length > 0 && sampler) {
           track.notes.forEach((note) => {
             Tone.getTransport().schedule((time) => {
-              piano.keyDown({ note: note.name, time })
-              piano.keyUp({
-                note: note.name,
-                time: time + note.duration,
-              })
+              sampler.triggerAttackRelease(note.name, note.duration, time)
             }, note.time)
           })
         }
@@ -85,7 +80,7 @@ const MidiPlayer: React.FC<MidiPlayerProps> = ({
       Tone.getTransport().stop()
       Tone.getTransport().cancel()
     }
-  }, [midi, piano, playbackState])
+  }, [midi, playbackState, sampler])
 
   useEffect(() => {
     const updateProgress = () => {
