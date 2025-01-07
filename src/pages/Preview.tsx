@@ -56,12 +56,13 @@ const Preview: React.FC<PreviewProps> = ({
   }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-full p-4">
+    <div className="flex flex-col items-center justify-center gap-10 h-full p-4">
       {!isPianoLoaded ? (
         <div>Loading piano samples...</div>
       ) : (
         <>
-          <div className="flex flex-col items-center justify-center gap-4">
+          <h2 className="text-2xl">Preview generated song.</h2>
+          <div className="flex flex-col items-center justify-center gap-10">
             <PianoRoll
               midi={midi}
               sampler={sampler.current}

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { BackendError, GenerateMidiParams } from '@/types'
+import { BackendError, GenerateMidiParams, Genre } from '@/types'
 
 // const API_BASE_URL = 'https://midiforgeapi.onrender.com/api'
 const API_BASE_URL = 'http://127.0.0.1:8000/api'
@@ -22,15 +22,9 @@ const generateMidi = async (
     })
 }
 
-type Genre = {
-  code: string
-  name: string
-}
-type GetGenresResponse = Genre[]
-
-const getGenres = async (): Promise<GetGenresResponse> => {
+const getGenres = async (): Promise<Genre[]> => {
   return axios
-    .get<GetGenresResponse>(`${API_BASE_URL}/genres/`)
+    .get<Genre[]>(`${API_BASE_URL}/genres/`)
     .then((response) => response.data)
     .catch((error) => {
       const statusCode = error?.status
