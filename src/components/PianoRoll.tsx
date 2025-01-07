@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Midi } from '@tonejs/midi'
-import { cn } from '@/lib/utils'
+import { Piano } from '@tonejs/piano'
 import * as Tone from 'tone'
+import { cn } from '@/lib/utils'
 
 type Note = {
   midi: number
@@ -11,10 +12,15 @@ type Note = {
 
 type PianoRollProps = {
   midi: Midi | null
+  piano: Piano | null
   playbackState: Tone.PlaybackState
 }
 
-const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
+const PianoRoll: React.FC<PianoRollProps> = ({
+  midi,
+  piano,
+  playbackState,
+}) => {
   const [notes, setNotes] = useState<Note[]>([])
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const animationRef = useRef<number | null>(null)
@@ -22,7 +28,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
   const startTimeRef = useRef<number | null>(null)
 
   const pitchRange = 128
-  const noteHeight = 20 // Height of each note tile
+  const noteHeight = 10 // Height of each note tile
   const rollSpeed = 200 // Pixels per second
   const isWhiteKey = [
     true,
@@ -38,6 +44,27 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
     false,
     true,
   ]
+
+  const playKey = async (midiPitch: number) => {
+    if (playbackState == 'started') return
+
+    if (Tone.getContext().state !== 'running') {
+      console.log(`Tone context is ${Tone.getContext().state}`)
+      await Tone.start()
+    }
+    piano?.keyDown({ midi: midiPitch })
+  }
+
+  const releaseKey = async (midiPitch: number) => {
+    if (playbackState == 'started') return
+
+    if (Tone.getContext().state !== 'running') {
+      console.log(`Tone context is ${Tone.getContext().state}`)
+      await Tone.start()
+    }
+
+    piano?.keyUp({ midi: midiPitch })
+  }
 
   useEffect(() => {
     const loadMidi = async () => {
@@ -56,29 +83,29 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
     loadMidi()
   }, [midi])
 
-  const drawLines = (ctx: CanvasRenderingContext2D, width: number) => {
-    ctx.strokeStyle = '#5e606e'
-    ctx.lineWidth = 1
-    for (let i = 0; i < pitchRange; i++) {
-      const y = i * noteHeight
-      ctx.beginPath()
-      ctx.moveTo(0, y)
-      ctx.lineTo(width, y)
-      ctx.stroke()
-    }
-  }
-
-  const drawNotes = (ctx: CanvasRenderingContext2D, offset: number) => {
-    notes.forEach((note) => {
-      const x = note.time * rollSpeed - offset
-      const y = (pitchRange - note.midi - 1) * noteHeight
-      const width = note.duration * rollSpeed
-      ctx.fillStyle = '#0c7e45'
-      ctx.fillRect(x, y, width, noteHeight)
-    })
-  }
-
   useEffect(() => {
+    const drawLines = (ctx: CanvasRenderingContext2D, width: number) => {
+      ctx.strokeStyle = '#5e606e'
+      ctx.lineWidth = 1
+      for (let i = 0; i < pitchRange; i++) {
+        const y = i * noteHeight
+        ctx.beginPath()
+        ctx.moveTo(0, y)
+        ctx.lineTo(width, y)
+        ctx.stroke()
+      }
+    }
+
+    const drawNotes = (ctx: CanvasRenderingContext2D, offset: number) => {
+      notes.forEach((note) => {
+        const x = note.time * rollSpeed - offset + 25
+        const y = (pitchRange - note.midi - 1) * noteHeight
+        const width = note.duration * rollSpeed
+        ctx.fillStyle = '#0c7e45'
+        ctx.fillRect(x, y, width, noteHeight)
+      })
+    }
+
     if (!canvasRef.current) return
 
     const canvas = canvasRef.current
@@ -132,30 +159,40 @@ const PianoRoll: React.FC<PianoRollProps> = ({ midi, playbackState }) => {
       <div
         className={`h-[${
           noteHeight * pitchRange
-        }px] w-[100px] border-r-2 border-gray`}
+        }px] w-[100px] border-r-2 border-gray bg-white`}
       >
         {Array.from({ length: pitchRange }, (_, k) => k)
           .reverse()
-          .map((pitch) => {
-            const note = pitch % 12
+          .map((midiPitch) => {
+            const note = midiPitch % 12
             const isWhite = isWhiteKey[note]
-            return (
+            return isWhite ? (
               <div
-                key={pitch}
+                key={midiPitch}
                 className={cn(
-                  `h-5 w-full bg-white hover:${
-                    isWhite ? 'bg-green' : 'bg-white'
-                  } border-y border-light-gray`
+                  `h-[10px] w-full hover:cursor-pointer bg-white hover:bg-green active:bg-green/80 border-y border-light-gray`
                 )}
+                onMouseDown={() => playKey(midiPitch)}
+                onMouseUp={() => releaseKey(midiPitch)}
               >
-                {isWhite ? null : (
-                  <div className="h-full w-3/5 bg-gray hover:bg-green"></div>
-                )}
-                {note == 0 ? (
-                  <span className="h-full w-full flex justify-end items-center text-sm text-gray">
-                    C{pitch / 12 - 1}
+                {note === 0 ? (
+                  <span className="h-full w-full flex justify-end items-center text-xs text-gray">
+                    {Tone.Midi(midiPitch).toNote()}
                   </span>
                 ) : null}
+              </div>
+            ) : (
+              <div
+                key={midiPitch}
+                className={cn(
+                  `h-[10px] w-full bg-white border-y border-light-gray`
+                )}
+              >
+                <div
+                  className="h-full w-3/5 hover:cursor-pointer bg-gray hover:bg-green active:bg-green/80"
+                  onMouseDown={() => playKey(midiPitch)}
+                  onMouseUp={() => releaseKey(midiPitch)}
+                ></div>
               </div>
             )
           })}
