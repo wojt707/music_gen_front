@@ -113,7 +113,7 @@ const Parameters: React.FC<ParametersProps> = ({
             <div>Length (tokens)</div>
             <div>Randomness (%)</div>
           </div>
-          <div className="flex flex-col items-center justify-around w-full h-full gap-4">
+          <div className="flex flex-col items-center justify-around min-w-40 w-full h-full gap-4">
             <Slider
               className="w-full bg-blue"
               defaultValue={[tempoBpm]}
