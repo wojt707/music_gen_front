@@ -28,7 +28,9 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
   const pitchRange = 128
   const noteHeight = 10 // Height of each note tile
-  const rollSpeed = 200 // Pixels per second
+  const screenWidth = window.innerWidth
+  const rollSpeed =
+    screenWidth > 1000 ? 150 : screenWidth > 200 ? (screenWidth * 3) / 20 : 60 // Pixels per second
   const isWhiteKey = [
     true,
     false,
@@ -98,7 +100,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
 
     const drawNotes = (ctx: CanvasRenderingContext2D, offset: number) => {
       notes.forEach((note) => {
-        const x = note.time * rollSpeed - offset + 25
+        const x = note.time * rollSpeed - offset + rollSpeed / 6
         const y = (pitchRange - note.midi - 1) * noteHeight
         const width = note.duration * rollSpeed
         ctx.fillStyle = '#0c7e45'
@@ -201,7 +203,7 @@ const PianoRoll: React.FC<PianoRollProps> = ({
         <canvas
           className="backdrop-blur-sm"
           ref={canvasRef}
-          width={800}
+          width={screenWidth > 1000 ? 800 : screenWidth - 170}
           height={pitchRange * noteHeight}
         />
       </div>

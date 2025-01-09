@@ -84,7 +84,7 @@ const Parameters: React.FC<ParametersProps> = ({
       <h2 className="text-2xl text-center">Set song parameters.</h2>
       <div className="flex flex-col gap-10">
         {genres.length ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-1 min-[370px]:grid-cols-2 md:grid-cols-4 mx-auto gap-4">
             {genres.map((genre) => (
               <Button
                 variant="default"
@@ -107,47 +107,91 @@ const Parameters: React.FC<ParametersProps> = ({
         ) : (
           <div className="text-center">No genres found.</div>
         )}
-        <div className="flex flex-row items-center justify-between w-full gap-4">
-          <div className="flex flex-col items-start justify-center gap-4 h-full min-w-fit">
+        {window.innerWidth > 500 ? (
+          <div className="flex flex-row items-center justify-between w-full gap-4">
+            <div className="flex flex-col items-start justify-center gap-4 h-full min-w-fit">
+              <div>Tempo (BPM)</div>
+              <div>Length (tokens)</div>
+              <div>Randomness (%)</div>
+            </div>
+            <div className="flex flex-col items-center justify-around min-w-40 w-full h-full gap-4">
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[tempoBpm]}
+                value={[tempoBpm]}
+                onValueChange={(e) => setTempoBpm(e[0])}
+                min={50}
+                max={200}
+                step={1}
+              />
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[length]}
+                value={[length]}
+                onValueChange={(e) => setLength(e[0])}
+                min={10}
+                max={500}
+                step={1}
+              />
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[randomness]}
+                value={[randomness]}
+                onValueChange={(e) => setRandomness(e[0])}
+                min={-100}
+                max={100}
+                step={1}
+              />
+            </div>
+            <div className="flex flex-col items-end justify-center h-full min-w-12 gap-4">
+              <div>{tempoBpm}</div>
+              <div>{length}</div>
+              <div>{randomness}</div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center w-full gap-4">
             <div>Tempo (BPM)</div>
+            <div className="flex flex-row items-center w-full gap-4">
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[tempoBpm]}
+                value={[tempoBpm]}
+                onValueChange={(e) => setTempoBpm(e[0])}
+                min={50}
+                max={200}
+                step={1}
+              />
+              <div className="min-w-12">{tempoBpm}</div>
+            </div>
             <div>Length (tokens)</div>
+            <div className="flex flex-row items-center w-full gap-4">
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[length]}
+                value={[length]}
+                onValueChange={(e) => setLength(e[0])}
+                min={10}
+                max={500}
+                step={1}
+              />
+              <div className="min-w-12">{length}</div>
+            </div>
             <div>Randomness (%)</div>
+            <div className="flex flex-row items-center w-full gap-4">
+              <Slider
+                className="w-full bg-blue"
+                defaultValue={[randomness]}
+                value={[randomness]}
+                onValueChange={(e) => setRandomness(e[0])}
+                min={-100}
+                max={100}
+                step={1}
+              />
+              <div className="text-center">{randomness}</div>
+            </div>
           </div>
-          <div className="flex flex-col items-center justify-around min-w-40 w-full h-full gap-4">
-            <Slider
-              className="w-full bg-blue"
-              defaultValue={[tempoBpm]}
-              value={[tempoBpm]}
-              onValueChange={(e) => setTempoBpm(e[0])}
-              min={50}
-              max={200}
-              step={1}
-            />
-            <Slider
-              className="w-full bg-blue"
-              defaultValue={[length]}
-              value={[length]}
-              onValueChange={(e) => setLength(e[0])}
-              min={10}
-              max={500}
-              step={1}
-            />
-            <Slider
-              className="w-full bg-blue"
-              defaultValue={[randomness]}
-              value={[randomness]}
-              onValueChange={(e) => setRandomness(e[0])}
-              min={-100}
-              max={100}
-              step={1}
-            />
-          </div>
-          <div className="flex flex-col items-end justify-center h-full min-w-12 gap-4">
-            <div>{tempoBpm}</div>
-            <div>{length}</div>
-            <div>{randomness}</div>
-          </div>
-        </div>
+        )}
       </div>
       <Button
         variant="outline"

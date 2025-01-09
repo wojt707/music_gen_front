@@ -58,10 +58,10 @@ const Preview: React.FC<PreviewProps> = ({
   return (
     <div className="flex flex-col items-center justify-center gap-10 h-full p-4">
       {!isPianoLoaded ? (
-        <div>Loading piano samples...</div>
+        <div className="text-center">Loading piano samples...</div>
       ) : (
         <>
-          <h2 className="text-2xl">Preview generated song.</h2>
+          <h2 className="text-2xl text-center">Preview generated song.</h2>
           <div className="flex flex-col items-center justify-center gap-10">
             <PianoRoll
               midi={midi}
