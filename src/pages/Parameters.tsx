@@ -18,7 +18,6 @@ const Parameters: React.FC<ParametersProps> = ({
   const [genres, setGenres] = useState<Genre[]>([])
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null)
   const [tempoBpm, setTempoBpm] = useState<number>(120) // Tempo in bpm
-  // const [duration, setDuration] = useState<number | null>(30) // Duration of the song in seconds
   const [length, setLength] = useState<number>(200) // Number of words (tokens) in the piece
   const [randomness, setRandomness] = useState<number>(0) // Randomness of the song
   const [isServerLoading, setIsServerLoading] = useState<boolean>(false)
@@ -70,13 +69,13 @@ const Parameters: React.FC<ParametersProps> = ({
   }, [])
 
   useEffect(() => {
-    if (isServerLoading) {
-      setTimeout(() => {
+    setTimeout(() => {
+      if (isServerLoading) {
         toast.info(
-          'Be patient, server is waking up... It can take approximately 60 seconds.'
+          'Be patient, server is waking up... It can take couple of seconds.'
         )
-      }, 5000)
-    }
+      }
+    }, 5000)
   }, [isServerLoading])
 
   return (
