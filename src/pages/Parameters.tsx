@@ -69,13 +69,18 @@ const Parameters: React.FC<ParametersProps> = ({
   }, [])
 
   useEffect(() => {
-    setTimeout(() => {
-      if (isServerLoading) {
+    let timeout: NodeJS.Timeout | null = null
+    if (isServerLoading) {
+      timeout = setTimeout(() => {
         toast.info(
-          'Be patient, server is waking up... It can take couple of seconds.'
+          'Be patient, server is waking up... It can take a couple of seconds.'
         )
-      }
-    }, 5000)
+      }, 5000)
+    }
+
+    return () => {
+      if (timeout) clearTimeout(timeout)
+    }
   }, [isServerLoading])
 
   return (

@@ -46,8 +46,8 @@ const noteImages = [
 ]
 
 const App: React.FC = () => {
-  const numberOfPages = 3.5
-  const numberOfNotes = 100
+  const numberOfPages = 4
+  const numberOfNotes = window.innerWidth > 600 ? 100 : 50
   const pianoWidth = window.innerWidth > 1200 ? 245 : 0 // Background piano keyboard width in pixels
 
   const notes: BackgroundNote[] = Array.from(
