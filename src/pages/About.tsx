@@ -2,8 +2,8 @@ import { Button } from '@/components'
 
 const About: React.FC = () => {
   return (
-    <div className="flex flex-col justify-between items-center min-h-full w-full gap-2 min-[330px]:gap-10 p-4 text-center">
-      <div className="flex flex-col justify-center items-center h-full w-full gap-2 min-[330px]:gap-10 ">
+    <div className="flex flex-col min-h-full w-full gap-2 min-[330px]:gap-10 p-4 text-center">
+      <div className="flex-grow flex flex-col justify-center items-center h-full w-full gap-2 min-[330px]:gap-10">
         <h2 className="text-2xl">How it works?</h2>
         <div className="flex flex-col gap-4 min-[370px]:gap-10 max-w-[701px] min-[430px]:px-8 text-justify text-xs">
           <div>
