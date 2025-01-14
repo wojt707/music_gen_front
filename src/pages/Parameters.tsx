@@ -88,13 +88,17 @@ const Parameters: React.FC<ParametersProps> = ({
       <h2 className="text-2xl text-center">Set song parameters.</h2>
       <div className="flex flex-col gap-10">
         {genres.length ? (
-          <div className="grid grid-cols-1 min-[370px]:grid-cols-2 md:grid-cols-4 mx-auto gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 mx-auto gap-4">
             {genres.map((genre) => (
               <Button
                 variant="default"
                 key={genre.code}
                 className={cn(
-                  selectedGenre === genre.code ? 'bg-blue hover:bg-blue/80' : ''
+                  `${
+                    selectedGenre === genre.code
+                      ? 'bg-blue hover:bg-blue/80'
+                      : ''
+                  } max-[350px]:text-xs`
                 )}
                 onClick={() => handleSelect(genre)}
               >
@@ -103,9 +107,12 @@ const Parameters: React.FC<ParametersProps> = ({
             ))}
           </div>
         ) : isServerLoading ? (
-          <div className="grid grid-cols-1 min-[370px]:grid-cols-2 md:grid-cols-4 mx-auto gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 mx-auto gap-4  w-full">
             {Array.from({ length: 11 }).map((_, i) => (
-              <Skeleton key={i} className="w-[160px] h-[40px] bg-gray" />
+              <Skeleton
+                key={i}
+                className="max-[350px]:w-auto w-[160px] h-[40px] bg-gray"
+              />
             ))}
           </div>
         ) : (

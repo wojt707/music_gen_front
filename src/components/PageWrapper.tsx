@@ -13,7 +13,7 @@ const PageWrapper: React.FC<PageWrapperProps> = ({
   return (
     <ParallaxLayer
       offset={offset}
-      speed={0.5}
+      speed={window.innerHeight > 700 ? 0.5 : 1}
       style={{
         marginLeft: `${pianoWidth}px`,
         width: `calc(100%-${pianoWidth}px)`,
