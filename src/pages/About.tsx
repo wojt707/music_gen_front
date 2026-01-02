@@ -42,7 +42,7 @@ const About: React.FC = () => {
             </a>
           </Button>
         </div>
-        <div>© Wojciech Dolibóg 2025</div>
+        <div>© Wojciech Dolibóg {new Date().getFullYear()}</div>
       </div>
     </div>
   )

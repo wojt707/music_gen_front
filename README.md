@@ -35,10 +35,10 @@ npm install
 
 ### Configuration
 
-Update `.env` with your backend URL:
+Update `.env` with your backend URL just like in `.env.example`:
 
 ```env
-BACKEND_URL=<your_backend_url>
+VITE_BACKEND_URL=<your_backend_url>
 ```
 
 ### Development
