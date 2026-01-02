@@ -1,50 +1,66 @@
-# React + TypeScript + Vite
+# MidiForge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Currently, two official plugins are available:
+AI-powered MIDI music generation application. Generate unique compositions by specifying parameters and genre preferences.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Checkout working demo on [Midi Forge](https://midiforge.onrender.com)!
 
-## Expanding the ESLint configuration
+## Features
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- AI-powered MIDI generation with customizable parameters and genre selection
+- Interactive piano roll visualization
+- Real-time music playback with piano samples
 
-- Configure the top-level `parserOptions` property like this:
+## Tech Stack
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+- React 18.3 + TypeScript 5.6
+- Vite 5.4 with HMR
+- Tailwind CSS + Shadcn/ui
+- Tone.js for audio playback
+- Axios for API communication
+
+## Quick Start
+
+### Prerequisites
+
+Node.js 18+ and npm
+
+### Installation
+
+```bash
+git clone https://github.com/wojt707/music_gen_front.git
+cd music_gen_front
+npm install
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### Configuration
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Update `.env` with your backend URL:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```env
+BACKEND_URL=<your_backend_url>
 ```
+
+### Development
+
+```bash
+npm run dev
+```
+
+Available at `http://localhost:5173`
+
+### Build
+
+```bash
+npm run build
+```
+
+## API Endpoints
+
+- `POST /generate` - Generate MIDI
+- `GET /genres` - Fetch available genres
+- `GET /samples/{note}` - Get piano samples
+
+## License
+
+See [LICENSE](LICENSE) file.

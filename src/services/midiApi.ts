@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { BackendError, GenerateMidiParams, Genre } from '@/types'
 
-// const API_BASE_URL = 'http://127.0.0.1:5000/api'
-const API_BASE_URL = 'https://midi-forge-api.lm.r.appspot.com/api'
+const VITE_BACKEND_URL = import.meta.env.VITE_BACKEND_URL as string
 
 type GenerateMidiResponse = Blob
 
@@ -10,7 +9,7 @@ const generateMidi = async (
   params: GenerateMidiParams
 ): Promise<GenerateMidiResponse> => {
   return axios
-    .post<GenerateMidiResponse>(`${API_BASE_URL}/generate`, params, {
+    .post<GenerateMidiResponse>(`${VITE_BACKEND_URL}/generate`, params, {
       responseType: 'blob',
     })
     .then((response) => response.data)
@@ -25,7 +24,7 @@ const generateMidi = async (
 
 const getGenres = async (): Promise<Genre[]> => {
   return axios
-    .get<Genre[]>(`${API_BASE_URL}/genres`)
+    .get<Genre[]>(`${VITE_BACKEND_URL}/genres`)
     .then((response) => response.data)
     .catch((error) => {
       console.error('Error fetching genres:', error)
@@ -54,7 +53,7 @@ const getPianoSamples = async (): Promise<SampleResponse> => {
   await Promise.all(
     sampleNames.map(async (sampleName) => {
       await axios
-        .get(`${API_BASE_URL}/samples/${sampleName}v8.mp3`, {
+        .get(`${VITE_BACKEND_URL}/samples/${sampleName}v8.mp3`, {
           responseType: 'arraybuffer',
         })
         .then((response) => {
